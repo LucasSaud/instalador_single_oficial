@@ -259,25 +259,21 @@ instalacao_base() {
     salvar_etapa 17
   fi
   if [ "$etapa" -le "17" ]; then
-    config_cron_base || trata_erro "config_cron_base"
-    salvar_etapa 18
-  fi
-  if [ "$etapa" -le "18" ]; then
     if [ "${proxy}" == "nginx" ]; then
       config_nginx_base || trata_erro "config_nginx_base"
-      salvar_etapa 19
+      salvar_etapa 18
     elif [ "${proxy}" == "traefik" ]; then
       config_traefik_base || trata_erro "config_traefik_base"
-      salvar_etapa 19
+      salvar_etapa 18
     fi
   fi
-  if [ "$etapa" -le "19" ]; then
+  if [ "$etapa" -le "18" ]; then
     config_latencia_base || trata_erro "config_latencia_base"
-    salvar_etapa 20
+    salvar_etapa 19
   fi
-  if [ "$etapa" -le "20" ]; then
+  if [ "$etapa" -le "19" ]; then
     fim_instalacao_base || trata_erro "fim_instalacao_base"
-    salvar_etapa 21
+    salvar_etapa 19
   fi
 }
 
@@ -1243,45 +1239,6 @@ EOF
 
     sleep 2
   } || trata_erro "instala_frontend_base"
-}
-
-# Configura cron de atualização de dados da pasta public
-config_cron_base() {
-  printf "${GREEN} >> Adicionando cron atualizar o uso da public às 3h da manhã...${WHITE} \n"
-  echo
-  {
-    if ! command -v cron >/dev/null 2>&1; then
-      sudo apt-get update
-      sudo apt-get install -y cron
-    fi
-    sleep 2
-    wget -O /home/deploy/atualiza_public.sh https://raw.githubusercontent.com/FilipeCamillo/busca_tamaho_pasta/main/busca_tamaho_pasta.sh >/dev/null 2>&1
-    chmod +x /home/deploy/atualiza_public.sh >/dev/null 2>&1
-    chown deploy:deploy /home/deploy/atualiza_public.sh >/dev/null 2>&1
-    echo '#!/bin/bash
-pm2 restart all' >/home/deploy/reinicia_instancia.sh
-    chmod +x /home/deploy/reinicia_instancia.sh
-    chown deploy:deploy /home/deploy/reinicia_instancia.sh >/dev/null 2>&1
-    sudo su - deploy <<'EOF'
-        CRON_JOB1="0 3 * * * wget -O /home/deploy/atualiza_public.sh https://raw.githubusercontent.com/FilipeCamillo/busca_tamaho_pasta/main/busca_tamaho_pasta.sh && bash /home/deploy/atualiza_public.sh >> /home/deploy/cron.log 2>&1"
-        CRON_JOB2="0 1 * * * /bin/bash /home/deploy/reinicia_instancia.sh >> /home/deploy/cron.log 2>&1"
-        CRON_EXISTS1=$(crontab -l 2>/dev/null | grep -F "${CRON_JOB1}")
-        CRON_EXISTS2=$(crontab -l 2>/dev/null | grep -F "${CRON_JOB2}")
-
-        if [[ -z "${CRON_EXISTS1}" ]] || [[ -z "${CRON_EXISTS2}" ]]; then
-            printf "${GREEN} >> Cron não detectado, agendando agora...${WHITE} "
-            {
-                crontab -l 2>/dev/null
-                [[ -z "${CRON_EXISTS1}" ]] && echo "${CRON_JOB1}"
-                [[ -z "${CRON_EXISTS2}" ]] && echo "${CRON_JOB2}"
-            } | crontab -
-        else
-            printf "${GREEN} >> Crons já existem, continuando...${WHITE} \n"
-        fi
-EOF
-
-    sleep 2
-  } || trata_erro "config_cron_base"
 }
 
 # Configura Nginx

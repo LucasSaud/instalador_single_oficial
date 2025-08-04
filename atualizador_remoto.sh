@@ -44,30 +44,6 @@ dummy_carregar_variaveis() {
 # Funções de atualização
 backup_app_atualizar() {
 
-# Dados do Whaticket
-TOKEN="ultranotificacoes"
-QUEUE_ID="15"
-USER_ID=""
-MENSAGEM="🚨 INICIANDO Atualização do ${nome_titulo}"
-
-# Lista de números
-NUMEROS=("${numero_suporte}" "5518988029627")
-
-# Enviar para cada número
-for NUMERO in "${NUMEROS[@]}"; do
-  curl -s -X POST https://apiweb.ultrawhats.com.br/api/messages/send \
-    -H "Authorization: Bearer $TOKEN" \
-    -H "Content-Type: application/json" \
-    -d '{
-      "number": "'"$NUMERO"'",
-      "body": "'"$MENSAGEM"'",
-      "userId": "'"$USER_ID"'",
-      "queueId": "'"$QUEUE_ID"'",
-      "sendSignature": false,
-      "closeTicket": true
-    }'
-done
-
   dummy_carregar_variaveis
   source /home/deploy/${empresa}/backend/.env
   {
@@ -167,30 +143,6 @@ EOF
   printf "${WHITE} >> Atualização do ${nome_titulo} concluída...\n"
   echo
   sleep 5
-
-# Dados do Whaticket
-TOKEN="ultranotificacoes"
-QUEUE_ID="15"
-USER_ID=""
-MENSAGEM="🚨 INICIANDO Atualização do ${nome_titulo}"
-
-# Lista de números
-NUMEROS=("${numero_suporte}" "5518988029627")
-
-# Enviar para cada número
-for NUMERO in "${NUMEROS[@]}"; do
-  curl -s -X POST https://apiweb.ultrawhats.com.br/api/messages/send \
-    -H "Authorization: Bearer $TOKEN" \
-    -H "Content-Type: application/json" \
-    -d '{
-      "number": "'"$NUMERO"'",
-      "body": "'"$MENSAGEM"'",
-      "userId": "'"$USER_ID"'",
-      "queueId": "'"$QUEUE_ID"'",
-      "sendSignature": false,
-      "closeTicket": true
-    }'
-done
 
 }
 
